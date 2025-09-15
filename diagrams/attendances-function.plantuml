@@ -1,0 +1,29 @@
+@startuml attendances
+start
+if (action) then (verify)
+  -[#green]->
+  #lightgreen:if (can set attendance?) then (no)
+    :response 200 false;
+    stop
+  else (yes)
+  endif
+else (set)
+  -[#red]->
+  if (user valid?) then (no)
+    (E)
+    detach
+  #lightgreen:elseif (can set attendance?) then (no)
+    (E)
+    detach
+  elseif (attendance setted?) then (no)
+    (E)
+    detach
+  else (yes)
+  endif
+endif
+:response 200 true;
+stop
+(E)
+:response 400 error;
+stop
+@enduml
