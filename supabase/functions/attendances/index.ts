@@ -6,7 +6,7 @@ import { Database } from '../_shared/database.types.ts'
 
 const validActions = ['verify', 'set']
 const validTimes = {
-  start: 18,
+  start: 1,
   end: 24
 }
 
@@ -42,10 +42,10 @@ Deno.serve(async (req: Request) => {
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError) return jsonResponse({ message: authError.message }, 401)
     if (!user || !uuid.validate(user.id)) return jsonResponse({ message: 'user.id not valid!' }, 401)
-    const userId = user.id
 
     // can set attendance?
     const nowInRome = Temporal.Now.zonedDateTimeISO('Europe/Rome')
+    // TO-DO verify in attendances table
     const { data: groupsRows, error: selectError } = await supabaseAdmin
       .from('groups')
       .select('id,days_of_week')
@@ -54,14 +54,19 @@ Deno.serve(async (req: Request) => {
     if (groupsRows.length !== 1) return jsonResponse({ message: 'non-existent group!' }, 400)
     const allowedDay = groupsRows[0].days_of_week.includes(nowInRome.dayOfWeek)
     const allowedTime = (nowInRome.hour >= validTimes.start && nowInRome.hour < validTimes.end)
-    if (!allowedDay || !allowedTime) return jsonResponse({ message: 'day or time not allowed!' }, 401)
+    if (!allowedDay || !allowedTime) return jsonResponse({ message: 'day or time not allowed!' }, 403)
 
     if (action === 'verify') {
       return jsonResponse({ day_of_week: nowInRome.dayOfWeek }, 200)
+    } else if (action === 'set') {
+      const { error: insertError } = await supabaseAdmin
+        .from('attendances')
+        .insert([
+          { marked_day: nowInRome.toPlainDate().toString(), user_id: user.id, group_id: group },
+        ])
+      if (insertError) throw insertError
+      return jsonResponse({ message: 'attendance marked' }, 200)
     }
-    // } else if (action === 'set') {
-    //   null
-    // }
     return jsonResponse({ message: 'I\'m a teapot' }, 418)
 
   // deno-lint-ignore no-explicit-any
