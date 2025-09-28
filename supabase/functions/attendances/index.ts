@@ -14,9 +14,7 @@ console.info(`Edge function "attendances" up and running!`)
 
 Deno.serve(async (req: Request) => {
   // This is needed if you're planning to invoke your function from a browser.
-  if (req.method === 'OPTIONS') {
-    return new Response('ok')
-  }
+  if (req.method === 'OPTIONS') return new Response('ok')
 
   try {
     // check payload
@@ -37,10 +35,12 @@ Deno.serve(async (req: Request) => {
     const nowInRome = Temporal.Now.zonedDateTimeISO('Europe/Rome')
 
     // can set attendance?
-    const allowed = await allowedAttendance(supabaseAdmin, group, nowInRome)
-    if (allowed.code !== 200) return jsonResponseMessage(allowed.message, allowed.code)
+    const allowed = await allowedAttendance(supabaseAdmin, group, nowInRome, userId)
+    if (allowed.code !== 200) return jsonResponseMessage(allowed.message, allowed.code,
+                                                         {group_setted: allowed.groupSetted})
 
-    if (action === 'verify') return jsonResponse({ day_of_week: nowInRome.dayOfWeek }, 200)
+    if (action === 'verify') return jsonResponseMessage('attendance markable', 200,
+                                                        { day_of_week: nowInRome.dayOfWeek })
     // attendance setted?
     if (action === 'set') {
       const setted = await setAttendance(supabaseAdmin, group, nowInRome, userId)
@@ -48,7 +48,8 @@ Deno.serve(async (req: Request) => {
     }
 
     return jsonResponseMessage('I\'m a teapot', 418)
-  } catch (err) {
-    return jsonResponse({ catched_error: err }, 500)
+  } catch (rawError) {
+    const msgInError = rawError instanceof Object && 'message' in rawError
+    return jsonResponse({ catched_error: msgInError ? rawError.message : rawError }, 500)
   }
 })
