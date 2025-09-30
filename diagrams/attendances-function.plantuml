@@ -1,31 +1,34 @@
 @startuml attendances
 (E)
-:response 400 error;
+:response not 200 status;
 stop
 
 start
+if (payload valid?) then (no)
+  (E)
+  detach
+else (yes)
+endif
 if (user valid?) then (no)
   (E)
   detach
 else (yes)
 endif
 if (can set attendance?) then (no)
-  if (action) then (set)
-    (E)
-    detach
-  else (verify)
-    :response 200 false;
-  endif
+  (E)
+  detach
 else (yes)
-  if (action) then (set)
-    if (attendance setted?) then (no)
-      (E)
-      detach
-    else (yes)
-    endif
-  else (verify)
+endif
+if (action) then (verify)
+  :response 200 status;
+else if (action) then (set)
+  if (attendance setted?) then (yes)
+    :response 200 status;
+  else (no)
+    :response 500 status;
   endif
-  :response 200 true;
+else
+  :I'm a teapot;
 endif
 stop
 @enduml
