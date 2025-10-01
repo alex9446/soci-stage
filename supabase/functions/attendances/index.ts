@@ -12,12 +12,14 @@ const validActions = ['verify', 'set', 'make_coffee']
 console.info(`Edge function "attendances" up and running!`)
 
 
+// All comments starting with @uml refer to the activity diagram
+
 Deno.serve(async (req: Request) => {
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === 'OPTIONS') return new Response('ok')
 
   try {
-    // check payload
+    // @uml - payload valid?
     const { action, group } = await req.json()
     if (!validActions.includes(action)) return jsonResponseMessage('action not valid!', 400)
     if (!Number.isInteger(group)) return jsonResponseMessage('group is not an integer!', 400)
@@ -27,22 +29,22 @@ Deno.serve(async (req: Request) => {
       Deno.env.get('SECRET_FUNCTIONS_KEY')!
     )
 
-    // user valid?
+    // @uml - user valid?
     const validate = await validateUser(req, supabaseAdmin)
     if (validate.code !== 200) return jsonResponseMessage(validate.message, validate.code)
     const userId = validate.userId ?? ''
 
     const nowInRome = Temporal.Now.zonedDateTimeISO('Europe/Rome')
 
-    // can set attendance?
+    // @uml - can set attendance?
     const allowed = await allowedAttendance(supabaseAdmin, group, nowInRome, userId)
     if (allowed.code !== 200) return jsonResponseMessage(allowed.message, allowed.code,
                                                          {group_setted: allowed.groupSetted})
 
     if (action === 'verify') return jsonResponseMessage('attendance markable', 200,
                                                         { day_of_week: nowInRome.dayOfWeek })
-    // attendance setted?
     if (action === 'set') {
+      // @uml - attendance setted?
       const setted = await setAttendance(supabaseAdmin, group, nowInRome, userId)
       return jsonResponseMessage(setted.message, setted.code)
     }
