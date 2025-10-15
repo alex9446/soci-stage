@@ -1,5 +1,4 @@
 /* @refresh reload */
-import './reset.css'
 import { render } from 'solid-js/web'
 import { Route, Router } from '@solidjs/router'
 import { Home } from './Home'
