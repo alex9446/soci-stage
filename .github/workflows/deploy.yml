@@ -27,7 +27,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     env:
-      Greeting: Hello
+      VITE_GREET: Hello
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
