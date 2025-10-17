@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: LS n°1
-        run: ls -lha dist
+        run: ls -lha
       - name: Build
         env:
           VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
