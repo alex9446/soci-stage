@@ -5,6 +5,11 @@ import { type Database } from './database.types'
 const supabaseContext = createContext<SupabaseClient<Database>>()
 
 export const Provider: ParentComponent = (props) => {
+  console.debug(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+  )
+  console.debug(import.meta.env)
   const supabase = createClient(
     import.meta.env.VITE_SUPABASE_URL,
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
