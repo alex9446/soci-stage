@@ -38,25 +38,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: LS n°1
-        run: ls -lha
+        run: ls -lha dist
       - name: Build
         env:
           VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build
       - name: LS n°2
-        run: ls -lha
+        run: ls -lha dist
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: LS n°3
-        run: ls -lha
+        run: ls -lha dist
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
           # Upload dist folder
           path: './dist'
       - name: LS n°4
-        run: ls -lha
+        run: ls -lha dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
