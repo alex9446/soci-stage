@@ -1,3 +1,5 @@
+reload
+
 ## Usage
 
 ```bash
