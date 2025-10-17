@@ -1,3 +1,5 @@
-import { A } from "@solidjs/router";
+import { A } from '@solidjs/router'
 
-export const Login = () => <A href='/'>Home</A>
+const Login = () => <A href='/'>Home</A>
+
+export default Login
